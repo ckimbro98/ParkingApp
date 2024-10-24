@@ -24,13 +24,10 @@ export default function Index() {
           />
 
           <View style={styles.separator}></View>
-          <View style={styles.button}>
-            <Button
-              title="Browse parking lots"
-              color={'white'}
-              onPress={browseLotsHandler}
-            ></Button>
-          </View>
+          <CustomButton
+            onPress={browseLotsHandler}
+            title="Browse Parking Lots"
+          />
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
