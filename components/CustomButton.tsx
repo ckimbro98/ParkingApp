@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     borderRadius: 25, // For rounded corners
     paddingVertical: 10,
     paddingHorizontal: 20,
+    marginHorizontal: 30,
     alignItems: 'center',
   },
   text: {
