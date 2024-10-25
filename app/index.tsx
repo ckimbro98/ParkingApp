@@ -1,66 +1,86 @@
-import { StyleSheet, Button, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { router, Link } from 'expo-router';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import CustomButton from '@/components/CustomButton';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { useState } from 'react';
+import * as Location from 'expo-location';
 
-export default function Index() {
-  const browseLotsHandler = () => {
-    console.log('browseLotsHandler');
+export default function MainPage() {
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null,
+  );
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const colorScheme = useColorScheme();
+  // event that runs when user presses "find my spots"
+  // not implemented yet
+  const findSpotsHandler = () => {
+    console.log('findSpotsHandler');
   };
 
-  const useMyLocationHandler = () => {
-    console.log('useMyLocationHandler');
+  // event that runs when user presses "record a spot"
+  // snapshots their location, then navigates them to the record-spot page
+  const recordSpotHandler = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    // location fail - needs future implementation (asking users to give location details)
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return;
+    }
+
+    setLoading(true);
+    const currentLocation = await Location.getCurrentPositionAsync({});
+    setLoading(false);
+    // navigate to the record-spot screen
+    router.push({
+      pathname: './record-spot',
+      params: { location: JSON.stringify(currentLocation) },
+    });
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'space-around',
+      alignItems: 'stretch',
+      marginHorizontal: 16,
+    },
+    title: {
+      textAlign: 'center',
+      marginVertical: 8,
+      fontSize: 24,
+      color: Colors[colorScheme ?? 'light'].text,
+    },
+    separator: {
+      marginVertical: 20,
+      borderBottomColor: Colors[colorScheme ?? 'light'].tint,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+    },
+  });
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <View>
-          <Text style={styles.title}>Where are you parking?</Text>
-        </View>
-        <View>
-          <CustomButton
-            onPress={useMyLocationHandler}
-            title="Use My Location"
-          />
-
-          <View style={styles.separator}></View>
-          <CustomButton
-            onPress={browseLotsHandler}
-            title="Browse Parking Lots"
-          />
-        </View>
+        {loading ? (
+          <View>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text style={styles.title}>Getting your accurate location...</Text>
+          </View>
+        ) : (
+          <>
+            <View>
+              <Text style={styles.title}>Parking Helper</Text>
+            </View>
+            <View>
+              <CustomButton onPress={recordSpotHandler} title="Record a Spot" />
+              <View style={styles.separator} />
+              <CustomButton onPress={findSpotsHandler} title="Find My Spots" />
+            </View>
+          </>
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'space-around',
-    alignItems: 'stretch',
-    marginHorizontal: 16,
-  },
-  title: {
-    textAlign: 'center',
-    marginVertical: 8,
-    fontSize: 24,
-  },
-  fixToText: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  separator: {
-    marginVertical: 8,
-    borderBottomColor: '#737373',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  button: {
-    backgroundColor: 'blue',
-    borderRadius: 25, // For rounded corners
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginHorizontal: 30,
-    alignItems: 'center',
-  },
-});
