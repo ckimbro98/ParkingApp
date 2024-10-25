@@ -27,7 +27,14 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to access your location while your device is in use",
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
