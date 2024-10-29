@@ -22,11 +22,13 @@ export default function RecordSpot() {
   const coords = parsedLocation.coords;
   const timestamp = parsedLocation.timestamp;
 
+  // state for the map
   const [region, setRegion] = useState<Region>({
     ...coords,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  // state for the marker in the map
   const [marker, setMarker] = useState({
     latitude: coords.latitude,
     longitude: coords.longitude,
@@ -39,7 +41,7 @@ export default function RecordSpot() {
     setRegion(changedRegion);
   }
 
-  // needed for the marker, that changes all the time, not only when the maps finishes changing
+  // needed for the marker, that changes all the time, not only when the map finishes changing
   function onRegionChange(changedRegion: Region) {
     setMarker({
       latitude: changedRegion.latitude,
@@ -47,7 +49,7 @@ export default function RecordSpot() {
     });
   }
 
-  // User sets a marker, that updates in their local storage
+  // User sets a marker, that updates in local storage or backend database (which to use, I wonder)
   const saveMarkerLocation = () => {
     console.log('setMarker');
     localStorage.setItem('location', JSON.stringify(region));
