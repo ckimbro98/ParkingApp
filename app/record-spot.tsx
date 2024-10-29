@@ -3,13 +3,16 @@ import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import CustomButton from '@/components/CustomButton';
 import AdjustableMap from '@/components/AdjustableMap';
+import { router } from 'expo-router';
 
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import useLocations from '@/hooks/useLocations';
 
 import * as Location from 'expo-location';
 import { useLocalSearchParams } from 'expo-router';
 import { Region } from 'react-native-maps';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RecordSpot() {
   const colorScheme = useColorScheme();
@@ -21,6 +24,8 @@ export default function RecordSpot() {
   ) as Location.LocationObject;
   const coords = parsedLocation.coords;
   const timestamp = parsedLocation.timestamp;
+
+  const { addLocation } = useLocations();
 
   // state for the map
   const [region, setRegion] = useState<Region>({
@@ -50,10 +55,17 @@ export default function RecordSpot() {
   }
 
   // User sets a marker, that updates in local storage or backend database (which to use, I wonder)
-  const saveMarkerLocation = () => {
-    console.log('setMarker');
-    localStorage.setItem('location', JSON.stringify(region));
-    console.log('coords', region.latitude, region.longitude);
+  const saveMarkerLocation = async () => {
+    await addLocation({
+      latitude: marker.latitude,
+      longitude: marker.longitude,
+      latitudeDelta: 0.0461,
+      longitudeDelta: 0.02105,
+    });
+    router.replace({
+      pathname: './locations',
+      params: {},
+    });
   };
 
   return (
