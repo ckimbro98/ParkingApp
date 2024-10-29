@@ -9,10 +9,12 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 import * as Location from 'expo-location';
 import { useLocalSearchParams } from 'expo-router';
+import { Region } from 'react-native-maps';
 
 export default function RecordSpot() {
   const colorScheme = useColorScheme();
 
+  // all the data that can be received from the location of the user
   const location = useLocalSearchParams();
   const parsedLocation = JSON.parse(
     location?.location as string,
@@ -20,29 +22,46 @@ export default function RecordSpot() {
   const coords = parsedLocation.coords;
   const timestamp = parsedLocation.timestamp;
 
-  useEffect(() => {
-    console.log('location', location);
-    console.log(coords);
-    console.log(timestamp);
-  }, [location]);
+  const [region, setRegion] = useState<Region>({
+    ...coords,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+
+  function onRegionChange(changedRegion: Region) {
+    setRegion(changedRegion);
+  }
+
+  const setMarker = () => {
+    console.log('setMarker');
+    console.log('coords', region.latitude, region.longitude);
+  };
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <View style={{ alignItems: 'center' }}>
+        <View style={{ alignItems: 'center', gap: 20 }}>
           <Text
             style={{ color: Colors[colorScheme ?? 'light'].text, fontSize: 24 }}
           >
             Recorded Location
           </Text>
-          <AdjustableMap
-            initialRegion={{
-              latitude: coords.latitude,
-              longitude: coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-          ></AdjustableMap>
+          <View style={{ width: '90%', height: '80%' }}>
+            <AdjustableMap
+              initialRegion={{
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+              region={region}
+              onRegionChange={onRegionChange}
+            ></AdjustableMap>
+          </View>
+          <CustomButton
+            onPress={setMarker}
+            title={'Record Spot'}
+          ></CustomButton>
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
