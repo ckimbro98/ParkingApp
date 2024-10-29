@@ -1,17 +1,20 @@
 // useLocations.ts
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Region } from 'react-native-maps';
 
 const STORAGE_KEY = 'locations';
 
 const useLocations = () => {
-  const [locations, setLocations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [locations, setLocations] = useState<Array<Region>>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Add a location to local storage
   const addLocation = async (location: {
     latitude: number;
     longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
   }) => {
     try {
       const storedLocations = await AsyncStorage.getItem(STORAGE_KEY);
