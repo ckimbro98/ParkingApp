@@ -17,7 +17,7 @@ export default function MainPage() {
   // event that runs when user presses "find my spots"
   // not implemented yet
   const findSpotsHandler = () => {
-    console.log('findSpotsHandler');
+    router.push({ pathname: './locations', params: {} });
   };
 
   // event that runs when user presses "record a spot"
