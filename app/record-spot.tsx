@@ -27,13 +27,30 @@ export default function RecordSpot() {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  const [marker, setMarker] = useState({
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+  });
 
-  function onRegionChange(changedRegion: Region) {
+  // used by AdjustableMap, sets the new region, inherits it as props
+  // needed for the overall map's smoothness - see this issue:
+  // https://stackoverflow.com/questions/53181556/react-native-maps-onregionchange-stutters-the-map
+  function onRegionChangeComplete(changedRegion: Region) {
     setRegion(changedRegion);
   }
 
-  const setMarker = () => {
+  // needed for the marker, that changes all the time, not only when the maps finishes changing
+  function onRegionChange(changedRegion: Region) {
+    setMarker({
+      latitude: changedRegion.latitude,
+      longitude: changedRegion.longitude,
+    });
+  }
+
+  // User sets a marker, that updates in their local storage
+  const saveMarkerLocation = () => {
     console.log('setMarker');
+    localStorage.setItem('location', JSON.stringify(region));
     console.log('coords', region.latitude, region.longitude);
   };
 
@@ -46,7 +63,15 @@ export default function RecordSpot() {
           >
             Recorded Location
           </Text>
-          <View style={{ width: '90%', height: '80%' }}>
+          <View
+            style={{
+              width: '90%',
+              height: '80%',
+              borderStyle: 'dashed',
+              borderColor: 'red',
+              borderWidth: 2,
+            }}
+          >
             <AdjustableMap
               initialRegion={{
                 latitude: coords.latitude,
@@ -55,11 +80,13 @@ export default function RecordSpot() {
                 longitudeDelta: 0.0421,
               }}
               region={region}
+              marker={marker}
               onRegionChange={onRegionChange}
+              onRegionChangeComplete={onRegionChangeComplete}
             ></AdjustableMap>
           </View>
           <CustomButton
-            onPress={setMarker}
+            onPress={saveMarkerLocation}
             title={'Record Spot'}
           ></CustomButton>
         </View>
