@@ -1,25 +1,30 @@
 import React from 'react';
-import MapView, { Region } from 'react-native-maps';
+import MapView, { Region, Marker } from 'react-native-maps';
 import { StyleSheet, View } from 'react-native';
 import { useState } from 'react';
 
 interface AdjustableMapProps {
   initialRegion: Region;
+  region: Region;
+  onRegionChange: (changedRegion: Region) => void;
 }
 
-export default function AdjustableMap({ initialRegion }: AdjustableMapProps) {
-  const [region, setRegion] = useState<Region>(initialRegion);
-
-  function onRegionChange(changedRegion: Region) {
-    setRegion(changedRegion);
-  }
-
+export default function AdjustableMap({
+  initialRegion,
+  region,
+  onRegionChange,
+}: AdjustableMapProps) {
   return (
     <MapView
       style={styles.map}
       region={region}
       onRegionChange={onRegionChange}
-    />
+      zoomTapEnabled={false}
+    >
+      <Marker
+        coordinate={{ latitude: region.latitude, longitude: region.longitude }}
+      />
+    </MapView>
   );
 }
 
